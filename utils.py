@@ -33,7 +33,7 @@ def extract_entities(entities):
 
 
 
-def format_text(texto, lista_entities):
+def format_text(texto, lista_entities, dates):
     texto_formateado = texto
 
     for dic in lista_entities:
@@ -55,10 +55,28 @@ def format_text(texto, lista_entities):
 
         # Reemplazo en el texto original
         texto_formateado = re.sub(pattern, entidad_html, texto_formateado)
+    
+    for date in dates:
+        date_extract = date["word"]
+        tipo = date["entity_group"]
+
+        color = {
+            'DATE': 'yellow',
+        }.get(tipo, 'black')
+
+        # Construir el HTML
+        entidad_html = f"<span style='color:{color}'>{date_extract}</span>"
+
+        # Escapamos la entidad para que no se interprete mal en la regex
+        pattern = re.escape(date_extract)
+
+        # Reemplazo en el texto original
+        texto_formateado = re.sub(pattern, entidad_html, texto_formateado)
+
 
     return texto_formateado
 
-def show_table(entities):
+def show_table(entities, dates):
     PER = ""
     ORG = ""
     MISC = ""
@@ -77,10 +95,18 @@ def show_table(entities):
             PER += tag_html
         elif entity_group == 'LOC':
             LOC += tag_html
-        elif entity_group == 'DATE':
-            DATE += tag_html
         elif entity_group == 'ORG':
             ORG += tag_html
+
+    for date in dates:
+        entity_group = date['entity_group']
+        word = date['word']
+
+        tag_html = f'<li>{word}</li>'
+
+        if entity_group == 'DATE':
+            DATE += tag_html
+
 
     html_table = f"""
         <style>

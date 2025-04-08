@@ -18,14 +18,10 @@ class Model:
     
     def call_model_dates(self):
         from transformers import pipeline
-
         self.model = "agomez302/spanish-legal-dates-ner"
-        
         self.tokenizer = AutoTokenizer.from_pretrained(self.model)
-
         model_hf = AutoModelForTokenClassification.from_pretrained(self.model)
-        
-        pipe = pipeline(self.task, model = model_hf, tokenizer = self.tokenizer)
+        pipe = pipeline(self.task, model = model_hf, tokenizer = self.tokenizer, aggregation_strategy="simple")
 
         return pipe
     
@@ -33,7 +29,7 @@ class Model:
 
 def inference(pipe, texto):
     entities = pipe(texto)
-    print("ENTITIES", entities)
+    #print("ENTITIES", entities)
     #palabras = extract_entities(entities)
 
     return entities

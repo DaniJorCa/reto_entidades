@@ -34,13 +34,16 @@ if submit:
     if archivo or contenido:
         pass
     elif (texto):
-        print("TEXTo", texto)
+        #print("TEXTo", texto)
         model = Model()
         pipe = model.call_model_general()
+        pipe_dates = model.call_model_dates()
         entities = inference(pipe, texto)
-        print("inference entities", entities)
-        sentence = format_text(texto, entities)
-        html_table = show_table(entities)
+        dates = inference(pipe_dates, texto)
+        print("DATES", dates)
+        #print("inference entities", entities)
+        sentence = format_text(texto, entities, dates)
+        html_table = show_table(entities, dates)
 
         if sentence:
             st.markdown(sentence, unsafe_allow_html=True)
@@ -53,49 +56,10 @@ if submit:
                 - <span style='color:green;'>🟩 Organización (ORG)</span><br>
                 - <span style='color:purple;'>🟪 Lugar (LOC)</span><br>
                 - <span style='color:red;'>🟥 Misceláneo (MISC)</span>
+                - <span style='color:yellow;'>🟥 Fechas (DATE)</span>
                 """, unsafe_allow_html=True)
 
-        print(entities)
+        #print(entities)
 
     else:
         st.error("Introduce algun texto 🚨")
-
-
-
-# # Initialize chat history
-# if "messages" not in st.session_state:
-#     st.session_state.messages = [{"role": "assistant", "content": "Let's start chatting! 👇"}]
-
-# # Display chat messages from history on app rerun
-# for message in st.session_state.messages:
-#     with st.chat_message(message["role"]):
-#         st.markdown(message["content"])
-
-# # Accept user input
-# if prompt := st.chat_input("What is up?"):
-#     # Add user message to chat history
-#     st.session_state.messages.append({"role": "user", "content": prompt})
-#     # Display user message in chat message container
-#     with st.chat_message("user"):
-#         st.markdown(prompt)
-
-#     # Display assistant response in chat message container
-#     with st.chat_message("assistant"):
-#         message_placeholder = st.empty()
-#         full_response = ""
-#         assistant_response = random.choice(
-#             [
-#                 "Hello there! How can I assist you today?",
-#                 "Hi, human! Is there anything I can help you with?",
-#                 "Do you need help?",
-#             ]
-#         )
-#         # Simulate stream of response with milliseconds delay
-#         for chunk in assistant_response.split():
-#             full_response += chunk + " "
-#             time.sleep(0.05)
-#             # Add a blinking cursor to simulate typing
-#             message_placeholder.markdown(full_response + "▌")
-#         message_placeholder.markdown(full_response)
-#     # Add assistant response to chat history
-#     st.session_state.messages.append({"role": "assistant", "content": full_response})
