@@ -11,7 +11,7 @@ class Model:
         self.model = "mrm8488/bert-spanish-cased-finetuned-ner"
         self.tokenizer = AutoTokenizer.from_pretrained(self.model, use_fast=False)
         model_hf = AutoModelForTokenClassification.from_pretrained(self.model)
-        pipe = pipeline(self.task, model=model_hf, tokenizer=self.tokenizer)  
+        pipe = pipeline(self.task, model=model_hf, tokenizer=self.tokenizer, aggregation_strategy="simple")  
         
         return pipe
 
@@ -33,6 +33,8 @@ class Model:
 
 def inference(pipe, texto):
     entities = pipe(texto)
-    palabras = extract_entities(entities)
-    print(palabras)
+    print("ENTITIES", entities)
+    #palabras = extract_entities(entities)
+
+    return entities
 

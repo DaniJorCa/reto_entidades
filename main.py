@@ -2,6 +2,8 @@ import streamlit as st
 import random
 import time
 from model import Model, inference
+from utils import format_text, show_table
+import json
 
 st.title("Extracción de entidades")
 
@@ -35,15 +37,26 @@ if submit:
         print("TEXTo", texto)
         model = Model()
         pipe = model.call_model_general()
-        print("MODEL", model)
-        print('PIPE', pipe)
         entities = inference(pipe, texto)
+        print("inference entities", entities)
+        sentence = format_text(texto, entities)
+        html_table = show_table(entities)
+
+        if sentence:
+            st.markdown(sentence, unsafe_allow_html=True)
+
+            st.markdown(html_table, unsafe_allow_html=True)
+
+            st.markdown("""
+                ### Leyenda de colores:
+                - <span style='color:blue;'>🟦 Persona (PER)</span><br>
+                - <span style='color:green;'>🟩 Organización (ORG)</span><br>
+                - <span style='color:purple;'>🟪 Lugar (LOC)</span><br>
+                - <span style='color:red;'>🟥 Misceláneo (MISC)</span>
+                """, unsafe_allow_html=True)
 
         print(entities)
 
-
-
-        
     else:
         st.error("Introduce algun texto 🚨")
 
