@@ -44,8 +44,9 @@ def format_text(texto, lista_entities):
             'ORG': 'green',
             'PER': 'blue',
             'LOC': 'purple',
-            'MISC': 'red'
-        }.get(tipo, 'black')
+            'MISC': 'red',
+            'DATE': 'yellow'  # Asegúrate de que 'DATE' esté aquí
+        }.get(tipo, 'black')  # Color por defecto negro
 
         # Construir el HTML
         entidad_html = f"<span style='color:{color}'>{entidad}</span>"
