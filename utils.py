@@ -1,5 +1,8 @@
 import re
 import math
+import tiktoken
+from model import Model
+
 
 def extract_entities(entities):
     lista_posiciones = []
@@ -56,23 +59,6 @@ def format_text(texto, lista_entities):
 
         # Reemplazo en el texto original
         texto_formateado = re.sub(pattern, entidad_html, texto_formateado)
-    
-    # for date in dates:
-    #     date_extract = date["word"]
-    #     tipo = date["entity_group"]
-
-    #     color = {
-    #         'DATE': 'yellow',
-    #     }.get(tipo, 'black')
-
-    #     # Construir el HTML
-    #     entidad_html = f"<span style='color:{color}'>{date_extract}</span>"
-
-    #     # Escapamos la entidad para que no se interprete mal en la regex
-    #     pattern = re.escape(date_extract)
-
-    #     # Reemplazo en el texto original
-    #     texto_formateado = re.sub(pattern, entidad_html, texto_formateado)
 
 
     return texto_formateado
@@ -148,8 +134,15 @@ def show_table(entities):
 
     return html_table
 
-        
+def check_length(texto: str) -> bool:
+    model = Model()
+    pipe_general = model.call_model_general()
+    tokenizer = pipe_general.tokenizer
 
+    tokens = tokenizer.tokenize(texto)
+    return len(tokens) < 512
 
-
-
+def load_text(file):
+    # Leer el contenido del archivo como texto
+    texto = file.read().decode("utf-8")
+    return texto

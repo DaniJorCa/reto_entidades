@@ -1,5 +1,5 @@
 from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline
-from utils import extract_entities
+
 
 class Model:
     def __init__(self):
@@ -24,6 +24,7 @@ class Model:
         pipe = pipeline(self.task, model = model_hf, tokenizer = self.tokenizer, aggregation_strategy="simple")
 
         return pipe
+    
     
 
 
