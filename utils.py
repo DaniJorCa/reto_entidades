@@ -33,7 +33,7 @@ def extract_entities(entities):
 
 
 
-def format_text(texto, lista_entities, dates):
+def format_text(texto, lista_entities):
     texto_formateado = texto
 
     for dic in lista_entities:
@@ -57,27 +57,27 @@ def format_text(texto, lista_entities, dates):
         # Reemplazo en el texto original
         texto_formateado = re.sub(pattern, entidad_html, texto_formateado)
     
-    for date in dates:
-        date_extract = date["word"]
-        tipo = date["entity_group"]
+    # for date in dates:
+    #     date_extract = date["word"]
+    #     tipo = date["entity_group"]
 
-        color = {
-            'DATE': 'yellow',
-        }.get(tipo, 'black')
+    #     color = {
+    #         'DATE': 'yellow',
+    #     }.get(tipo, 'black')
 
-        # Construir el HTML
-        entidad_html = f"<span style='color:{color}'>{date_extract}</span>"
+    #     # Construir el HTML
+    #     entidad_html = f"<span style='color:{color}'>{date_extract}</span>"
 
-        # Escapamos la entidad para que no se interprete mal en la regex
-        pattern = re.escape(date_extract)
+    #     # Escapamos la entidad para que no se interprete mal en la regex
+    #     pattern = re.escape(date_extract)
 
-        # Reemplazo en el texto original
-        texto_formateado = re.sub(pattern, entidad_html, texto_formateado)
+    #     # Reemplazo en el texto original
+    #     texto_formateado = re.sub(pattern, entidad_html, texto_formateado)
 
 
     return texto_formateado
 
-def show_table(entities, dates):
+def show_table(entities):
     PER = ""
     ORG = ""
     MISC = ""
@@ -98,33 +98,32 @@ def show_table(entities, dates):
             LOC += tag_html
         elif entity_group == 'ORG':
             ORG += tag_html
-
-    for date in dates:
-        entity_group = date['entity_group']
-        word = date['word']
-
-        tag_html = f'<li>{word}</li>'
-
-        if entity_group == 'DATE':
+        elif entity_group == 'DATE':
             DATE += tag_html
-
 
     html_table = f"""
         <style>
-            table {{
-                width: 100%;
-                border-collapse: collapse;
-                margin-bottom: 20px;
-            }}
-            th, td {{
-                padding: 8px 12px;
-                border: 1px solid #ddd;
-                text-align: left;
-            }}
-            th {{
-                font-weight: bold;
-            }}
-        </style>
+        table {{
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+        }}
+        th, td {{
+            padding: 10px 14px;
+            border: 1px solid #ccc;
+            text-align: left;
+        }}
+        th {{
+            font-weight: bold;
+            background-color: #f2f2f2;
+        }}
+        ul {{
+            padding-left: 18px;
+            margin: 0;
+        }}
+    </style>
         <table>
             <thead>
                 <tr>
@@ -132,30 +131,20 @@ def show_table(entities, dates):
                     <th>Palabras</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>PERSONA</td>
-                    <td><ul>{PER}</ul></td>
-                </tr>
-                <tr>
-                    <td>ORGANIZACIÓN</td>
-                    <td><ul>{ORG}</ul></td>
-                </tr>
-                <tr>
-                    <td>LOCALIZACIÓN</td>
-                    <td><ul>{LOC}</ul></td>
-                </tr>
-                <tr>
-                    <td>FECHA</td>
-                    <td><ul>{DATE}</ul></td>
-                </tr>
-                <tr>
-                    <td>MISCELÁNEA</td>
-                    <td><ul>{MISC}</ul></td>
-                </tr>
-            </tbody>
-        </table>
+            <tbody>        
     """
+
+
+    items = {"PERSONA": PER, "ORGANIZACIÓN":ORG, "MISCELANEA":MISC, "LOCALIZACIÓN": LOC, "FECHA": DATE}
+
+    for key, value in items.items():
+        if value != "":
+            html_table += f"""<tr>
+                                <td>{key}</td>
+                                <td><ul>{value}</ul></td>
+                            </tr>"""
+            
+    html_table += "</tbody></table>"
 
     return html_table
 

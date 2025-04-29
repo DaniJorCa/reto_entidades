@@ -1,4 +1,6 @@
 import streamlit as st
+import streamlit.components.v1 as components
+
 import random
 import time
 from model import Model, inference
@@ -58,10 +60,12 @@ if submit:
         # Mostrar tabla con todas las entidades
         html_table = show_table(all_entities)
 
+        print("HTML TABLE", html_table)
+
         if sentence:
             st.markdown(sentence, unsafe_allow_html=True)
 
-            st.markdown(html_table, unsafe_allow_html=True)
+            components.html(html_table, height=400, scrolling=True)
 
             st.markdown("""
                 ### Leyenda de colores:
