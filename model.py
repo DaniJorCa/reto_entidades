@@ -25,6 +25,15 @@ class Model:
 
         return pipe
     
+    def call_model_multilinguage(self):
+        from transformers import pipeline
+        self.model = "dslim/bert-base-NER"
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model)
+        model_multilingual = AutoModelForTokenClassification.from_pretrained(self.model)
+        pipe = pipeline(self.task, model = model_multilingual, tokenizer = self.tokenizer, aggregation_strategy="simple")
+
+        return pipe
+    
     
 
 

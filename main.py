@@ -10,6 +10,12 @@ import json
 st.title("Extracción de entidades")
 
 with st.sidebar:
+
+    opcion = st.selectbox(
+    "Elige una opción:",
+    ["Español", "Inglés", "Ambos"]
+    )
+
     # Cargar archivo
     archivo = st.file_uploader("Sube un archivo de texto", type=["txt"])
 
@@ -27,7 +33,7 @@ with st.sidebar:
         
     submit = st.button("Extraer Entidades")
 
-if submit:
+if submit and opcion:
     if texto:
         # Comprobamos que el texto tiene menos de 512 caracteres
         is_not_too_large = check_length(texto)
@@ -36,25 +42,32 @@ if submit:
             print("Texto introducido:", texto)
 
             model = Model()
+
+            entities_general = []
+            entities_multi = []
             
             # Llamar al modelo general
-            pipe_general = model.call_model_general()
-            entities_general = inference(pipe_general, texto)
-            print("Entidades modelo general:", entities_general)
+            if opcion == 'Español' or opcion == 'Ambos':
+                pipe_general = model.call_model_general()
+                entities_general = inference(pipe_general, texto)
 
             # Llamar al modelo de fechas
             pipe_dates = model.call_model_dates()
             entities_dates = inference(pipe_dates, texto)
-            print("Entidades modelo fechas:", entities_dates)
+
+            # Llamar al modelo multilingual
+            if opcion == 'Inglés' or opcion == 'Ambos':
+                pipe_multi = model.call_model_multilinguage()
+                entities_multi =inference(pipe_multi, texto)
 
             # Normalizar: asegurarnos de que todos tienen 'entity_group'
-            for entity in entities_general + entities_dates:
+            for entity in entities_general + entities_dates + entities_multi:
                 if "entity_group" not in entity:
                     entity["entity_group"] = entity["entity"]  # Copiar 'entity' en 'entity_group'
 
 
             # Combinar entidades de ambos modelos
-            all_entities = entities_general + entities_dates
+            all_entities = entities_general + entities_dates + entities_multi
             print("Todas las entidades combinadas:", all_entities)
 
             # Formatear el texto con todas las entidades
@@ -62,8 +75,6 @@ if submit:
 
             # Mostrar tabla con todas las entidades
             html_table = show_table(all_entities)
-
-            print("HTML TABLE", html_table)
 
             if sentence:
                 st.markdown(sentence, unsafe_allow_html=True)

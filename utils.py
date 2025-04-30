@@ -38,6 +38,8 @@ def extract_entities(entities):
 
 def format_text(texto, lista_entities):
     texto_formateado = texto
+    TODO #falta esto de las palabras descartadas
+    palabras_descartadas = []
 
     for dic in lista_entities:
         entidad = dic["word"]
@@ -48,17 +50,25 @@ def format_text(texto, lista_entities):
             'PER': 'blue',
             'LOC': 'purple',
             'MISC': 'red',
-            'DATE': 'yellow'  # Asegúrate de que 'DATE' esté aquí
+            'DATE': 'yellow'
         }.get(tipo, 'black')  # Color por defecto negro
 
         # Construir el HTML
         entidad_html = f"<span style='color:{color}'>{entidad}</span>"
 
         # Escapamos la entidad para que no se interprete mal en la regex
-        pattern = re.escape(entidad)
+        pattern = r'\b' + re.escape(entidad) + r'\b'
 
-        # Reemplazo en el texto original
-        texto_formateado = re.sub(pattern, entidad_html, texto_formateado)
+        # Verificamos si hay coincidencia antes de reemplazar
+        if re.search(pattern, texto_formateado):
+            # Hay coincidencia, hacemos el reemplazo
+            texto_formateado = re.sub(pattern, entidad_html, texto_formateado)
+        else:
+            print(f"No se encontró la entidad: {entidad}")
+
+        
+
+
 
 
     return texto_formateado
@@ -74,18 +84,20 @@ def show_table(entities):
         entity_group = entity['entity_group']
         word = entity['word']
 
-        tag_html = f'<li>{word}</li>'
+        if ('[UNK]' not in word) and ("##" not in word):
 
-        if entity_group == 'MISC':
-            MISC += tag_html
-        elif entity_group == 'PER':
-            PER += tag_html
-        elif entity_group == 'LOC':
-            LOC += tag_html
-        elif entity_group == 'ORG':
-            ORG += tag_html
-        elif entity_group == 'DATE':
-            DATE += tag_html
+            tag_html = f'<li>{word}</li>'
+
+            if entity_group == 'MISC':
+                MISC += tag_html
+            elif entity_group == 'PER':
+                PER += tag_html
+            elif entity_group == 'LOC':
+                LOC += tag_html
+            elif entity_group == 'ORG':
+                ORG += tag_html
+            elif entity_group == 'DATE':
+                DATE += tag_html
 
     html_table = f"""
         <style>
