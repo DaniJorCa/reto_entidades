@@ -1,4 +1,5 @@
 import re
+import os
 import math
 import tiktoken
 from model import Model
@@ -25,7 +26,7 @@ def extract_entities(entities):
 
         # Obtener tipo y palabra completa
         type_entity = lista_entities[0]['entity']
-        word = " ".join([ent['word'] for ent in lista_entities]).strip()
+        word = " ".join([ent['word'].replace('[UKN]', '').replace('#', '') for ent in lista_entities]).strip()
 
         diccionario = {'word': word, 'type': type_entity}
         lista_palabras.append(diccionario)
@@ -38,7 +39,6 @@ def extract_entities(entities):
 
 def format_text(texto, lista_entities):
     texto_formateado = texto
-    TODO #falta esto de las palabras descartadas
     palabras_descartadas = []
 
     for dic in lista_entities:
@@ -57,19 +57,18 @@ def format_text(texto, lista_entities):
         entidad_html = f"<span style='color:{color}'>{entidad}</span>"
 
         # Escapamos la entidad para que no se interprete mal en la regex
-        pattern = r'\b' + re.escape(entidad) + r'\b'
+        pattern = r'\b' + re.escape(entidad) + r'(?:\b|(?=[.,]))'
+
 
         # Verificamos si hay coincidencia antes de reemplazar
         if re.search(pattern, texto_formateado):
             # Hay coincidencia, hacemos el reemplazo
             texto_formateado = re.sub(pattern, entidad_html, texto_formateado)
         else:
-            print(f"No se encontró la entidad: {entidad}")
+            palabras_descartadas.append(entidad)
 
-        
-
-
-
+    os.environ['descartadas'] = ','.join(palabras_descartadas)
+    print("PALABRAS DESCARTADAS", os.environ['descartadas'])
 
     return texto_formateado
 
@@ -83,8 +82,9 @@ def show_table(entities):
     for entity in entities:
         entity_group = entity['entity_group']
         word = entity['word']
+        palabras_descartadas = os.environ['descartadas'].split(",")
 
-        if ('[UNK]' not in word) and ("##" not in word):
+        if ('[UNK]' not in word) and ("##" not in word) and word not in palabras_descartadas:
 
             tag_html = f'<li>{word}</li>'
 
