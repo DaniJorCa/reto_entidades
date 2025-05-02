@@ -12,7 +12,7 @@ st.title("Extracción de entidades")
 with st.sidebar:
 
     opcion = st.selectbox(
-    "Elige una opción:",
+    "Selecciona un modelo:",
     ["Español", "Inglés", "Ambos"]
     )
 
